@@ -1,4 +1,4 @@
-## Wrangle draft 1
+## Import Data
 
 
 # Housekeeping + prelims
@@ -6,11 +6,32 @@
 #dev.off()
 source("code/packages.R")
 
+install.packages("data.io")
+library(data.io)
+install.packages("remotes")
+remotes::install_github("SciViews/data.io")
+install.packages("googledrive")
+
 # Load main fish data - 18487 rows (V1 was 15274 rows)
 fish_raw <- data.io::read$csv("https://figshare.com/ndownloader/files/42424440?private_link=0a7edbfa91467638b998") %>% 
   mutate_if(is.character, as.factor) %>%                      # Fix ch vars
 #  mutate(Transect = as.numeric(str_remove(Transect, "T")))  # Make trans no numeric
   tibble()
+
+
+test <- data.io::read$xlsx("https://docs.google.com/spreadsheets/d/17A5B4BerYJ4TMDdZUJ7mP1Qw6iFnC3B0/edit?usp=drive_link&ouid=114479870703521888405&rtpof=true&sd=true
+")
+
+library(googledrive)
+test <- drive_download(
+  as_id("https://docs.google.com/spreadsheets/d/17A5B4BerYJ4TMDdZUJ7mP1Qw6iFnC3B0/edit?usp=drive_link&ouid=114479870703521888405&rtpof=true&sd=true
+"),
+  path = 'temp1.xlsx', 
+  overwrite = TRUE, 
+  type = "xlsx")
+
+test.2 <- readxl::read_excel('temp1.xlsx', sheet = "Fish_Data")
+
 
 #save(fish_raw, file = "data/Rdata/fish_raw.Rdata")    
 #load("data/Rdata/fish_raw.Rdata")    

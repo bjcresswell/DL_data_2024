@@ -1,0 +1,186 @@
+---
+title: "Survey_1_diversity_figures"
+author: "GF Galbraith"
+date: "2024-04-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Housekeeping
+```{r}
+rm(list=ls())
+dev.off()
+```
+
+#Packages
+```{r}
+library(tidyverse)
+library(janitor)
+library(readxl)
+library(vegan)
+library(plotrix)
+```
+
+# Import Data
+```{r}
+fish_data<- read_excel("../data/Video_analysis_data.xlsx", sheet = "Fish_Data")
+```
+
+# Check for missing values
+```{r}
+summary(is.na(fish_data))
+fish_data %>% filter(is.na(Count))
+```
+# Split fish counts and site variables
+Create new Unique T_ID first
+```{r}
+fish_data <- fish_data %>% mutate(
+  T_ID = paste(Survey,Site_no,Transect, sep = "_")
+)
+
+fish <- fish_data %>% select(T_ID, Species, Count)
+sites <- fish_data %>% select(T_ID, Date, Survey, Site_no, Site_name, Transect) %>% unique()
+```
+
+# Long to wide fish matrix
+```{r}
+
+# First get total abundance for all species
+fish<-fish %>% group_by(T_ID, Species) %>% 
+  summarise(Abundance=sum(Count)) %>% ungroup()
+
+# Then pivot to wide
+fish<-fish %>% pivot_wider(names_from = Species, values_from = Abundance) %>% 
+  replace(is.na(.),0)
+
+```
+
+# Extract matrix
+```{r}
+# Extract a species matrix - just species name and count
+spec.mat<-fish[,-1]
+```
+
+# Diversity indices
+```{r}
+# use the species matrix to calculate the indices
+fish$Richness <- rowSums(spec.mat>0)
+fish$Shannon <- diversity(spec.mat) # shannon is default
+fish$Simpson<-diversity(spec.mat, index = "simpson")
+fish$Abundance<-rowSums(spec.mat)
+```
+
+# Select diversity and TID
+```{r}
+diversity.data<-fish %>% select(T_ID, Richness,Shannon,Simpson, Abundance)
+```
+
+# Add Site Data back
+```{r}
+final.data <- left_join(sites, diversity.data, by = "T_ID")
+```
+
+# Nice colours
+10 sites
+```{r}
+library(ggsci)
+
+cols <- ggsci::pal_simpsons(palette = "springfield")
+
+```
+
+# Plot Mean species richness per site
+```{r}
+mean.richness <-final.data %>% group_by(Site_name) %>% summarise(
+  mean.site.richnness = mean(Richness),
+  SE = std.error(Richness)
+)
+
+richness.plot <-ggplot(mean.richness,
+                 aes(x=Site_name, y=mean.site.richnness, fill = Site_name))+
+  geom_bar(stat = "identity",position=position_dodge(width=1),width=0.5, colour = "black")+
+ geom_errorbar(aes(ymin=mean.site.richnness-SE, ymax=mean.site.richnness+SE), width=.2,
+                 position=position_dodge(1)) +
+    scale_y_continuous(expand = c(0,0),
+                     limits = c(0,20))+
+    scale_fill_simpsons()+
+  labs(x='', y=expression(Average~Number~of~Fish~Species))+
+   scale_x_discrete(labels = function(x) 
+    stringr::str_wrap(x, width = 12))+
+   theme_classic()+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(size=8,angle=45,vjust=0.5),
+        legend.position = "none")
+
+richness.plot
+
+ggsave(path = "../figures",filename = "Mean_site_fish_richness.png", plot= richness.plot,
+       device=png, width =150, height=80 , units = "mm", dpi = 500 )
+
+```
+
+
+# Plot mean total abundance per site
+```{r}
+mean.abundance <-final.data %>% group_by(Site_name) %>% summarise(
+  mean.site.abundance = mean(Abundance),
+  SE = std.error(Abundance)
+)
+
+abundance.plot <-ggplot(mean.abundance,
+                 aes(x=Site_name, y=mean.site.abundance, fill = Site_name))+
+  geom_bar(stat = "identity",position=position_dodge(width=1),width=0.5, colour = "black")+
+ geom_errorbar(aes(ymin=mean.site.abundance-SE, ymax=mean.site.abundance+SE), width=.2,
+                 position=position_dodge(1)) +
+    scale_y_continuous(expand = c(0,0),
+                     limits = c(0,250))+
+    scale_fill_simpsons()+
+  labs(x='', y=expression(Average~Fish~Abundance))+
+   scale_x_discrete(labels = function(x) 
+    stringr::str_wrap(x, width = 12))+
+   theme_classic()+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(size=8,angle=45,vjust=0.5),
+        legend.position = "none")
+
+abundance.plot
+
+ggsave(path = "../figures",filename = "Mean_site_fish_abundance.png", plot= abundance.plot,
+       device=png, width =150, height=80 , units = "mm", dpi = 500 )
+
+```
+
+
+# Plot mean fish diversity per site
+```{r}
+mean.diversity <-final.data %>% group_by(Site_name) %>% summarise(
+  mean.site.diversity = mean(Shannon),
+  SE = std.error(Shannon)
+)
+
+diversity.plot <-ggplot(mean.diversity,
+                 aes(x=Site_name, y=mean.site.diversity, fill = Site_name))+
+  geom_bar(stat = "identity",position=position_dodge(width=1),width=0.5, colour = "black")+
+ geom_errorbar(aes(ymin=mean.site.diversity-SE, ymax=mean.site.diversity+SE), width=.2,
+                 position=position_dodge(1)) +
+    scale_y_continuous(expand = c(0,0),
+                     limits = c(0,3))+
+    scale_fill_simpsons()+
+  labs(x='', y=expression(Average~Fish~Diversity))+
+   scale_x_discrete(labels = function(x) 
+    stringr::str_wrap(x, width = 12))+
+   theme_classic()+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(size=8,angle=45,vjust=0.5),
+        legend.position = "none")
+
+diversity.plot
+
+ggsave(path = "../figures",filename = "Mean_site_fish_diversity.png", plot= diversity.plot,
+       device=png, width =150, height=80 , units = "mm", dpi = 500 )
+
+```
+
