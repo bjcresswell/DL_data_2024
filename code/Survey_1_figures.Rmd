@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Housekeeping
 ```{r}
 rm(list=ls())
-dev.off()
+#dev.off()
 ```
 
 #Packages
@@ -120,6 +120,9 @@ richness.plot
 ggsave(path = "../figures",filename = "Mean_site_fish_richness.png", plot= richness.plot,
        device=png, width =150, height=80 , units = "mm", dpi = 500 )
 
+ggsave(path = "../figures",filename = "Mean_site_fish_richness.svg", plot= richness.plot,
+       device=svg, width =150, height=80 , units = "mm", dpi = 500 )
+
 ```
 
 
@@ -151,6 +154,9 @@ abundance.plot
 ggsave(path = "../figures",filename = "Mean_site_fish_abundance.png", plot= abundance.plot,
        device=png, width =150, height=80 , units = "mm", dpi = 500 )
 
+ggsave(path = "../figures",filename = "Mean_site_fish_abundance.svg", plot= abundance.plot,
+       device=svg, width =150, height=80 , units = "mm", dpi = 500 )
+
 ```
 
 
@@ -181,6 +187,9 @@ diversity.plot
 
 ggsave(path = "../figures",filename = "Mean_site_fish_diversity.png", plot= diversity.plot,
        device=png, width =150, height=80 , units = "mm", dpi = 500 )
+
+ggsave(path = "../figures",filename = "Mean_site_fish_diversity.svg", plot= diversity.plot,
+       device=svg, width =150, height=80 , units = "mm", dpi = 500 )
 
 ```
 
