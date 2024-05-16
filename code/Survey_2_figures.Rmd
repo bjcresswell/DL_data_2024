@@ -1,5 +1,5 @@
 ---
-title: "Survey_1_diversity_figures"
+title: "Survey_2_diversity_figures"
 author: "GF Galbraith"
 date: "2024-04-04"
 output: html_document
@@ -28,7 +28,7 @@ library(sjPlot)
 # Import Data
 ```{r}
 fish_data<- read_excel("../data/Video_analysis_data.xlsx", sheet = "Fish_Data")
-fish_data<- fish_data %>% filter(Survey == "Survey_1")
+fish_data<- fish_data %>% filter(Survey == "Survey_2")
 ```
 
 # Check for missing values
@@ -121,10 +121,10 @@ richness.plot
 
 tab_df(mean.richness)
 
-ggsave(path = "../figures",filename = "Mean_site_fish_richness.png", plot= richness.plot,
+ggsave(path = "../figures",filename = "Mean_site_fish_richness_survey2.png", plot= richness.plot,
        device=png, width =150, height=80 , units = "mm", dpi = 500 )
 
-ggsave(path = "../figures",filename = "Mean_site_fish_richness.svg", plot= richness.plot,
+ggsave(path = "../figures",filename = "Mean_site_fish_richness_survey2.svg", plot= richness.plot,
        device=svg, width =150, height=80 , units = "mm", dpi = 500 )
 
 ```
@@ -157,10 +157,10 @@ abundance.plot
 
 tab_df(mean.abundance)
 
-ggsave(path = "../figures",filename = "Mean_site_fish_abundance.png", plot= abundance.plot,
+ggsave(path = "../figures",filename = "Mean_site_fish_abundance_survey2.png", plot= abundance.plot,
        device=png, width =150, height=80 , units = "mm", dpi = 500 )
 
-ggsave(path = "../figures",filename = "Mean_site_fish_abundance.svg", plot= abundance.plot,
+ggsave(path = "../figures",filename = "Mean_site_fish_abundance_survey2.svg", plot= abundance.plot,
        device=svg, width =150, height=80 , units = "mm", dpi = 500 )
 
 ```
@@ -193,10 +193,10 @@ diversity.plot
 
 tab_df(mean.diversity)
 
-ggsave(path = "../figures",filename = "Mean_site_fish_diversity.png", plot= diversity.plot,
+ggsave(path = "../figures",filename = "Mean_site_fish_diversity_survey2.png", plot= diversity.plot,
        device=png, width =150, height=80 , units = "mm", dpi = 500 )
 
-ggsave(path = "../figures",filename = "Mean_site_fish_diversity.svg", plot= diversity.plot,
+ggsave(path = "../figures",filename = "Mean_site_fish_diversity_survey2.svg", plot= diversity.plot,
        device=svg, width =150, height=80 , units = "mm", dpi = 500 )
 
 ```
